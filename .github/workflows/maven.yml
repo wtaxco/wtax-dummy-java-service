@@ -17,21 +17,24 @@ jobs:
       sonar-login: ${{ secrets.SONAR_TOKEN }}
 
   deploy_developer:
-    environment: dev
-    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
+    with:
+      environment: dev
     needs:
       - build
 
   deploy_uat:
-    environment: uat
-    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
+    with:
+      environment: uat
     needs:
       - build
       - deploy_developer
 
   deploy_prod:
-    environment: prod
-    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
+    with:
+      environment: prod
     needs:
       - build
       - deploy_uat
