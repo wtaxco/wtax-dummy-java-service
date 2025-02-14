@@ -20,7 +20,7 @@ jobs:
     uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
       boot-jar: dummy
-      known-hosts: ""
+      known-hosts: "dummy ec2"
       ansible-inventory: inventory/developer.yml
       environment: dev
     secrets:
@@ -32,7 +32,7 @@ jobs:
     uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
       boot-jar: dummy
-      known-hosts: ""
+      known-hosts: "dummy ec2"
       ansible-inventory: inventory/uat.yml
       environment: uat
     secrets:
@@ -45,7 +45,7 @@ jobs:
     uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
       boot-jar: dummy
-      known-hosts: ""
+      known-hosts: "dummy ec2"
       ansible-inventory: inventory/prod.yml
       environment: prod
     secrets:
