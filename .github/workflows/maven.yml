@@ -24,6 +24,7 @@ jobs:
       ansible-inventory: inventory/developer.yml
       environment: dev
     secrets:
+      ansible-vault-password: ${{ secrets.VAULT_PASSWORD }}
       ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
     needs:
       - build
@@ -36,6 +37,7 @@ jobs:
       ansible-inventory: inventory/uat.yml
       environment: uat
     secrets:
+      ansible-vault-password: ${{ secrets.VAULT_PASSWORD }}
       ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
     needs:
       - build
@@ -49,6 +51,7 @@ jobs:
       ansible-inventory: inventory/prod.yml
       environment: prod
     secrets:
+      ansible-vault-password: ${{ secrets.VAULT_PASSWORD }}
       ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
     needs:
       - build
