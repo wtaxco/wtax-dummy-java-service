@@ -22,6 +22,8 @@ jobs:
       boot-jar: dummy
       ansible-inventory: inventory/developer.yml
       environment: dev
+    secrets:
+      ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
     needs:
       - build
 
@@ -31,6 +33,8 @@ jobs:
       boot-jar: dummy
       ansible-inventory: inventory/uat.yml
       environment: uat
+    secrets:
+      ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
     needs:
       - build
       - deploy_developer
@@ -41,6 +45,8 @@ jobs:
       boot-jar: dummy
       ansible-inventory: inventory/prod.yml
       environment: prod
+    secrets:
+      ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
     needs:
       - build
       - deploy_uat
