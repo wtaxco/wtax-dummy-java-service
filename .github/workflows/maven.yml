@@ -1,0 +1,37 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/build-maven-project.yml@main
+    secrets:
+      maven-repository-password: ${{ secrets.NEXUS_PASSWORD }}
+      sonar-login: ${{ secrets.SONAR_TOKEN }}
+
+  deploy_developer:
+    environment: dev
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
+    needs:
+      - build
+
+  deploy_uat:
+    environment: uat
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
+    needs:
+      - build
+      - deploy_developer
+
+  deploy_prod:
+    environment: prod
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
+    needs:
+      - build
+      - deploy_uat

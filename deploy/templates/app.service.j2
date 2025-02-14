@@ -1,0 +1,14 @@
+[Service]
+User={{ app.user }}
+WorkingDirectory={{ actual_app_root }}
+{% if (logstash is defined) %}
+ExecStart=/usr/bin/java --enable-preview -Xms{{ max_heap_size }} -Xmx{{ max_heap_size }} -Dlogback.logstash.host={{ logstash.host }} -Dlogback.logstash.port={{ logstash.port }} -Dlogback.logstash.environment={{ logstash.env }} -jar {{ actual_app_root }}/{{ boot_jar_basename }} --server.port={{ actual_server_port }}
+{% else %}
+ExecStart=/usr/bin/java --enable-preview -Xms{{ max_heap_size }} -Xmx{{ max_heap_size }} -jar {{ actual_app_root }}/{{ boot_jar_basename }} --server.port={{ actual_server_port }}
+{% endif %}
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+[Install]
+WantedBy=multi-user.target

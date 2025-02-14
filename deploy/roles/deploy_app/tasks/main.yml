@@ -1,0 +1,115 @@
+- name: set facts
+  set_fact:
+    service_name: "{{ app.name if config == 'prod' else app.name + '-' + config }}"
+
+- name: ensure the app temp folders exist and are owned by the app user
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ app.user }}"
+  with_items:
+    - "{{ temp_dir }}"
+    - "{{ temp_dir }}/config"
+    - "{{ temp_dir }}/logs"
+    - "{{ temp_dir }}/temp"
+  become: yes
+
+- name: copy the app jar
+  copy:
+    src: "{{ boot_jar }}"
+    dest: "{{ temp_dir }}/{{ boot_jar_basename }}"
+    owner: "{{ app.user }}"
+
+- name: enable SSL if certificate found
+  local_action:
+    module: stat
+    path: ./environments/{{ config }}/ssl
+  register: ssl
+
+- name: enable SSL if certificate found
+  set_fact:
+    ssl_enabled: "{{ ssl.stat.isdir is defined and ssl.stat.isdir | bool }}"
+
+- name: copy the config file for the correct environment
+  template:
+    src: "{{ item }}"
+    dest: "{{ temp_dir }}/config/"
+    owner: "{{ app.user }}"
+  with_fileglob:
+    - "./environments/{{ config }}/*"
+  become: yes
+
+- name: create PEM file containing SSL key and certificates
+  assemble:
+    src: "./environments/{{ config }}/ssl"
+    dest: "{{ temp_dir }}/config/keystore.pem"
+    remote_src: false
+    owner: "{{ app.user }}"
+  when: ssl_enabled
+  become: yes
+
+- name: create PKCS12 keystore containing key and certs
+  shell: openssl pkcs12 -export -in "{{ temp_dir }}/config/keystore.pem" -out "{{ temp_dir }}/config/keystore.p12" -password "pass:{{ key_store_password }}"
+  when: ssl_enabled
+  become: yes
+
+- name: make keystore readable by app user
+  file:
+    path: "{{ temp_dir }}/config/keystore.p12"
+    owner: "{{ app.user }}"
+  when: ssl_enabled
+  become: yes
+
+- name: customize the file to run app as an Ubuntu service
+  template:
+    src: app.service.j2
+    dest: /etc/systemd/system/{{ service_name }}.service
+  become: yes
+  register: systemd
+
+- name: reload systemd
+  command: systemctl daemon-reload
+  become: yes
+  when: systemd.changed
+
+- name: check for existing app install
+  stat:
+    path: "{{ actual_app_root }}"
+  register: app_stat
+
+- name: set backup directory name
+  set_fact:
+    app_backup_dir: "{{ actual_app_root }}.{{ ansible_date_time.iso8601_basic_short }}"
+
+- name: rename old install of app
+  command: mv "{{ actual_app_root }}" "{{ app_backup_dir }}"
+  when: app_stat.stat.exists
+  become: yes
+
+- name: put new install of app in place
+  command: mv "{{ temp_dir }}" "{{ actual_app_root }}"
+  become: yes
+
+- name: ensure app is started (and enabled at boot time)
+  service:
+    name: "{{ service_name }}"
+    state: restarted
+    enabled: true
+  become: yes
+
+- name: wait max 1min for app to come up
+  uri:
+    url: "{{ 'https' if ssl_enabled else 'http' }}://localhost:{{ actual_server_port }}/actuator/health"
+    validate_certs: no
+    status_code:
+      - 200
+  retries: 6
+  delay: 10
+  register: result
+  until: result is succeeded
+
+- name: remove old install of app
+  file:
+    path: "{{ app_backup_dir }}"
+    state: absent
+  become: yes

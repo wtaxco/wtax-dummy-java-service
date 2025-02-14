@@ -1,0 +1,10 @@
+#####################
+# Dry-run Deployment playbook
+#####################
+---
+- hosts: app_servers
+  gather_facts: false
+  tasks:
+    - name: Print dry-run message
+      debug:
+        msg: "Dry-run mode: Deployment is disabled. No actions have been performed."
