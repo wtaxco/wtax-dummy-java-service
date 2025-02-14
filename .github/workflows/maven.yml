@@ -19,6 +19,8 @@ jobs:
   deploy_developer:
     uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
+      boot-jar: dummy
+      ansible-inventory: inventory/developer.yml
       environment: dev
     needs:
       - build
@@ -26,6 +28,8 @@ jobs:
   deploy_uat:
     uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
+      boot-jar: dummy
+      ansible-inventory: inventory/uat.yml
       environment: uat
     needs:
       - build
@@ -34,6 +38,8 @@ jobs:
   deploy_prod:
     uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
+      boot-jar: dummy
+      ansible-inventory: inventory/prod.yml
       environment: prod
     needs:
       - build
