@@ -17,7 +17,7 @@ jobs:
       sonar-login: ${{ secrets.SONAR_TOKEN }}
 
   deploy_developer:
-    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
+    uses: wtaxco/wtax-github-actions-workflows/.github/workfows/deploy-java-app.yml@IN-468-Add-environment-input
     with:
       boot-jar: dummy
       known-hosts: "dummy ec2"
