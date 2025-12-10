@@ -17,12 +17,13 @@ jobs:
       sonar-login: ${{ secrets.SONAR_TOKEN }}
 
   deploy_developer:
-    uses: wtaxco/wtax-github-actions-workflows/.github/workfows/deploy-java-app.yml@IN-468-Add-environment-input
+    uses: wtaxco/wtax-github-actions-workflows/.github/workfows/deploy-java-app.yml@main
     with:
       boot-jar: dummy
       known-hosts: "dummy ec2"
       ansible-inventory: inventory/developer.yml
       environment: dev
+      environment-type: nonprod
     secrets:
       ansible-vault-password: ${{ secrets.VAULT_PASSWORD }}
       ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
@@ -30,12 +31,13 @@ jobs:
       - build
 
   deploy_uat:
-    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
     with:
       boot-jar: dummy
       known-hosts: "dummy ec2"
       ansible-inventory: inventory/uat.yml
       environment: uat
+      environment-type: nonprod
     secrets:
       ansible-vault-password: ${{ secrets.VAULT_PASSWORD }}
       ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
@@ -44,12 +46,13 @@ jobs:
       - deploy_developer
 
   deploy_prod:
-    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@IN-468-Add-environment-input
+    uses: wtaxco/wtax-github-actions-workflows/.github/workflows/deploy-java-app.yml@main
     with:
       boot-jar: dummy
       known-hosts: "dummy ec2"
       ansible-inventory: inventory/prod.yml
       environment: prod
+      environment-type: prod
     secrets:
       ansible-vault-password: ${{ secrets.VAULT_PASSWORD }}
       ssh-private-key: ${{ secrets.NONPROD_SSH_PRIVATE_KEY }}
